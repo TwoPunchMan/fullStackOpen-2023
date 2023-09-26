@@ -4,13 +4,13 @@ const morgan = require('morgan')
 const app = express()
 
 const logger = (tokens, req, res) => {
-	return [
+  return [
     tokens.method(req, res),
     tokens.url(req, res),
     tokens.status(req, res),
     tokens.res(req, res, 'content-length'), '-',
     tokens['response-time'](req, res), 'ms',
-		JSON.stringify(req.body)
+    JSON.stringify(req.body)
   ].join(' ')
 }
 
@@ -18,87 +18,99 @@ app.use(express.json())
 app.use(morgan(logger))
 
 let persons = [
-	{
-		"id": 1,
-		"name": "Arto Hellas",
-		"number": "040-123456"
-	},
-	{
-		"id": 2,
-		"name": "Ada Lovelace",
-		"number": "39-44-5323523"
-	},
-	{
-		"id": 3,
-		"name": "Dan Abramov",
-		"number": "12-43-234345"
-	},
-	{
-		"id": 4,
-		"name": "Mary Poppendieck",
-		"number": "39-23-6423122"
-	}
+  {
+    "id": 1,
+    "name": "Arto Hellas",
+    "number": "040-123456"
+  },
+  {
+    "id": 2,
+    "name": "Ada Lovelace",
+    "number": "39-44-5323523"
+  },
+  {
+    "id": 3,
+    "name": "Dan Abramov",
+    "number": "12-43-234345"
+  },
+  {
+    "id": 4,
+    "name": "Mary Poppendieck",
+    "number": "39-23-6423122"
+  }
 ]
 
 app.get('/', (req, res) => {
-	res.send('<h1>Hello phonebook</h1>')
+  res.send('<h1>Hello phonebook</h1>')
 })
 
 app.get('/api/persons', (req, res) => {
-	res.json(persons)
+  res.json(persons)
 })
 
 app.get('/api/persons/:id', (req, res) => {
-	const id = Number(req.params.id)
-	const person = persons.find(person => person.id === id)
+  const id = Number(req.params.id)
+  const person = persons.find(person => person.id === id)
 
-	if (!person) {
-		res.status(404).end('404 - Person not found')
-	} else {
-		res.json(person)
-	}
+  if (!person) {
+    res.status(404).end('404 - Person not found')
+  } else {
+    res.json(person)
+  }
 })
 
 app.get('/api/info', (req, res) => {
-	const numPeople = persons.length
-	const currentDate = new Date()
-	const output =
-		`<div>
-			Phonebook has info for ${numPeople} people
-			<br/></br>
-			${currentDate}
-		</div>`
+  const numPeople = persons.length
+  const currentDate = new Date()
+  const output =
+    `<div>
+      Phonebook has info for ${numPeople} people
+      <br/></br>
+      ${currentDate}
+    </div>`
 
-	res.send(output)
+  res.send(output)
 })
 
 app.post('/api/persons', (req, res) => {
-	const id = Math.floor(Math.random() * 10000)
-	const body = req.body
+  const id = Math.floor(Math.random() * 10000)
+  const body = req.body
 
-	if (!body.name) {
-		return res.status(404).json({
-			error: 'No Person listed'
-		})
-	}
+  if (!body.name) {
+    return res.status(404).json({
+      error: 'No Person listed'
+    })
+  } else if (!body.number) {
+    return res.status(404).json({
+      error: 'Number is missing'
+    })
+  }
 
-	const newPerson = {
-		id: id,
-		name: body.name,
-		number: body.number
-	}
+  const newPerson = {
+    id: id,
+    name: body.name,
+    number: body.number
+  }
 
-	persons = persons.concat(newPerson)
-	res.json(newPerson)
+  const isPersonAlreadyExist = persons.find(person => person.name === newPerson.name)
+
+  if (isPersonAlreadyExist) {
+    return res.status(404).json({
+      error: `${newPerson.name} is already listed.`
+    })
+  } else {
+    persons = persons.concat(newPerson)
+    res.json(newPerson)
+  }
 })
 
 app.delete('/api/persons/:id', (req, res) => {
-	const id = Number(req.params.id)
-	persons = persons.filter(person => person.id !== id)
-	res.status(204).end()
+  const id = Number(req.params.id)
+  persons = persons.filter(person => person.id !== id)
+  res.status(204).end()
 })
 
 const PORT = 3001
 app.listen(PORT, () => {
-	console.log(`Server running on port ${PORT}`)
+  console.log(`Server running on port ${PORT}`)
 })
