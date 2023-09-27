@@ -1,5 +1,5 @@
 const express = require('express')
-//const cors = require('cors')
+const cors = require('cors')
 
 const app = express()
 
@@ -18,11 +18,10 @@ const unknownEndpoint = (request, response) => {
 }
 
 app.use(express.json())
+app.use(cors())
 app.use(requestLogger)
 
 /*
-app.use(express.json())
-app.use(cors())
 app.use(express.static('dist'))
 */
 let notes = [
@@ -70,22 +69,22 @@ const generateId = () => {
 }
 
 app.post('/api/notes', (req, res) => {
-	const body = req.body
+  const body = req.body
 
-	if (!body.content) {
-		return res.status(404),json({
-			error: 'content missing'
-		})
-	}
+  if (!body.content) {
+    return res.status(404),json({
+      error: 'content missing'
+    })
+  }
 
-	const note = {
-		content: body.content,
-		important: body.important || false,
-		id: generateId()
-	}
+  const note = {
+    content: body.content,
+    important: body.important || false,
+    id: generateId()
+  }
 
-	notes = notes.concat(note)
-	res.json(note)
+  notes = notes.concat(note)
+  res.json(note)
 })
 
 app.delete('/api/notes/:id', (req, res) => {
