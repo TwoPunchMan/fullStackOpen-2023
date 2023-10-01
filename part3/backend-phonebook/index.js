@@ -1,6 +1,10 @@
+require('dotenv').config()
+
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+
+const Person = require('./models/person')
 
 const app = express()
 
@@ -21,7 +25,7 @@ const logger = `${morgan.tiny} :body`
 app.use(cors())
 app.use(morgan(logger))
 app.use(express.static('build'))
-
+/*
 let persons = [
   {
     "id": 1,
@@ -44,24 +48,32 @@ let persons = [
     "number": "39-23-6423122"
   }
 ]
-
+*/
 app.get('/', (req, res) => {
   res.send('<h1>Hello phonebook</h1>')
 })
 
 app.get('/api/persons', (req, res) => {
-  res.json(persons)
+  Person.find({}).then(persons => {
+    res.json(persons)
+  })
 })
 
 app.get('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id)
-  const person = persons.find(person => person.id === id)
+  //const id = Number(req.params.id)
+  //const person = persons.find(person => person.id === id)
 
-  if (!person) {
-    res.status(404).end('404 - Person not found')
-  } else {
-    res.json(person)
-  }
+  //if (!person) {
+  //  res.status(404).end('404 - Person not found')
+  //} else {
+  Person
+    .findById(req.params.id)
+    .then(person => {
+      res.json(person)
+    })
+    .catch(error => {
+      res.status(404).end('404 - Person not found')
+    })
 })
 
 app.get('/api/info', (req, res) => {
@@ -78,7 +90,6 @@ app.get('/api/info', (req, res) => {
 })
 
 app.post('/api/persons', (req, res) => {
-  const id = Math.floor(Math.random() * 10000)
   const body = req.body
 
   if (!body.name) {
@@ -91,21 +102,25 @@ app.post('/api/persons', (req, res) => {
     })
   }
 
-  const newPerson = {
-    id: id,
+  const newPerson = new Person ({
     name: body.name,
     number: body.number
-  }
+  })
 
-  const isPersonAlreadyExist = persons.find(person => person.name === newPerson.name)
+  let isPersonAlreadyExist;
+
+  Person.find({}).then(persons => {
+    isPersonAlreadyExist = persons.find(person => person.name === newPerson.name)
+  })
 
   if (isPersonAlreadyExist) {
     return res.status(404).json({
       error: `${newPerson.name} is already listed.`
     })
   } else {
-    persons = persons.concat(newPerson)
-    res.json(newPerson)
+    newPerson.save().then(savedPerson => {
+      res.json(savedPerson)
+    })
   }
 })
 
@@ -117,7 +132,7 @@ app.delete('/api/persons/:id', (req, res) => {
 
 app.use(unknownEndpoint)
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })

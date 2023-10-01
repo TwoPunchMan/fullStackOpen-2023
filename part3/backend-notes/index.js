@@ -60,7 +60,6 @@ app.post('/api/notes', (req, res) => {
 
   note.save().then(savedNote => {
     res.json(savedNote)
-
   })
 })
 
