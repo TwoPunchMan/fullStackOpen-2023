@@ -53,13 +53,14 @@ app.post('/api/notes', (req, res) => {
     })
   }
 
-  const note = {
+  const note = new Note({
     content: body.content,
     important: body.important || false
-  }
+  })
 
   note.save().then(savedNote => {
     res.json(savedNote)
+
   })
 })
 
