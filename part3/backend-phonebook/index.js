@@ -54,41 +54,40 @@ app.get('/api/info', (req, res) => {
   Person
     .find({})
     .then(persons => {
-      const currentDate = new Date()
-      const numPeople = persons.length
       const output =
         `<div>
-          Phonebook has info for ${numPeople} people
+          Phonebook has info for ${persons.length} people
           <br/></br>
-          ${currentDate}
+          ${new Date()}
         </div>`
       res.send(output)
     })
 })
 
-app.post('/api/persons', (req, res) => {
-  const body = req.body
+app.post('/api/persons', (req, res, next) => {
+  const { name, number } = req.body
 
-  if (!body.name) {
+  if (!name) {
     return res.status(404).json({
       error: 'No Person listed'
     })
-  } else if (!body.number) {
+  } else if (!number) {
     return res.status(404).json({
       error: 'Number is missing'
     })
   }
 
   const newPerson = new Person ({
-    name: body.name,
-    number: body.number
+    name,
+    number
   })
 
   newPerson
     .save()
     .then(savedPerson => {
       res.json(savedPerson)
-  })
+    })
+    .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (req, res, next) => {
