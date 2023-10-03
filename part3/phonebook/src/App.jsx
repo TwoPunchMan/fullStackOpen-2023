@@ -43,6 +43,9 @@ const App = () => {
         msgTimeout()
         setPersons(persons.concat(returnedPerson))
       })
+      .catch(error => {
+        console.log(error.res.data.error)
+      })
 
     clearForm()
   }
