@@ -39,8 +39,7 @@ const App = () => {
     phoneBookService
       .addNewPerson(newPerson)
       .then(returnedPerson => {
-        setMsg({ message: `Added ${newName}`, type: 'info' })
-        msgTimeout()
+        showMsg(`Added ${newName}`, 'info')
         setPersons(persons.concat(returnedPerson))
       })
       .catch(error => {
@@ -57,8 +56,7 @@ const App = () => {
       phoneBookService
         .updatePerson(person.id, updatedPerson)
         .then(updated => {
-          setMsg({ message: `Updated number for ${newName}`, type: 'info' })
-          msgTimeout()
+          showMsg(`Updated number for ${newName}`, 'info')
           const updatedInfo = persons.map(p => p.id !== person.id ? p : updated)
           setPersons(updatedInfo)
         })
@@ -68,20 +66,25 @@ const App = () => {
   }
 
   const deletePerson = (personToDelete) => {
-    if (window.confirm(`Delete ${personToDelete.name}?`)) {
+    const isPersonDelete = window.confirm(`Delete ${personToDelete.name}?`)
+
+    if (isPersonDelete) {
       phoneBookService
         .deletePerson(personToDelete.id)
         .then(() => {
-          setMsg({ message: `Deleted ${personToDelete.name}`, type: 'info' })
+          showMsg(`Deleted ${personToDelete.name}`, 'info')
           const undeletedPersons = persons.filter(p => personToDelete.id !== p.id)
           setPersons(undeletedPersons)
         })
         .catch(error => {
-          setMsg({ message: `Information of ${personToDelete.name} has already been removed from server`, type: 'error' })
+          showMsg(`Information of ${personToDelete.name} has already been removed from server`, 'error')
         })
-
-      msgTimeout()
     }
+  }
+
+  const showMsg = (msg, type) => {
+    setMsg({ message: msg, type: type })
+    msgTimeout()
   }
 
   const msgTimeout = () => {
