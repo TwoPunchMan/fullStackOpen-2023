@@ -1,3 +1,5 @@
+var _ = require('lodash')
+
 const dummy = (blogs) => {
   return 1
 }
@@ -12,10 +14,6 @@ const totalLikes = (blogs) => {
 }
 
 const favoriteBlog = (blogs) => {
-  if (!blogs) {
-    return {}
-  }
-
   let maxBlog = blogs[0]
 
   blogs.forEach(blog => {
@@ -27,8 +25,40 @@ const favoriteBlog = (blogs) => {
   return maxBlog
 }
 
+const mostBlogs = (blogs) => {
+  const authors = _.groupBy(blogs, 'author')
+
+  let table = []
+
+  _.forEach(authors, (arrayBlogs, author) => {
+    table.push({
+      'author': author,
+      'blogs': arrayBlogs.length
+    })
+  })
+
+  return _.maxBy(table, (author) => author.blogs)
+}
+
+const mostLikes = (blogs) => {
+  const authors = _.groupBy(blogs, 'author')
+
+  let table = []
+
+  _.forEach(authors, (arrayBlogs, author) => {
+    table.push({
+      'author': author,
+      'likes': _.sumBy(arrayBlogs, (author) => author.likes)
+    })
+  })
+
+  return _.maxBy(table, (author) => author.likes)
+}
+
 module.exports = {
   dummy,
   totalLikes,
-  favoriteBlog
+  favoriteBlog,
+  mostBlogs,
+  mostLikes
 }
