@@ -7,7 +7,7 @@ noteRouter.get('/', async (req, res) => {
   res.json(notes)
 })
 
-noteRouter.get('/:id', async (req, res, next) => {
+noteRouter.get('/:id', async (req, res) => {
   const note = await Note.findById(req.params.id)
 
   if (note) {
@@ -17,7 +17,7 @@ noteRouter.get('/:id', async (req, res, next) => {
   }
 })
 
-noteRouter.post('/', async (req, res, next) => {
+noteRouter.post('/', async (req, res) => {
   const body = req.body
 
   const note = new Note({

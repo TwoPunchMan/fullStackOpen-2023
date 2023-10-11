@@ -5,6 +5,7 @@ const blogListHelper = require('../utils/list_helper')
 const Blog = require('../models/blog')
 
 const app = require('../app')
+const { constant } = require('lodash')
 
 const api = supertest(app)
 
@@ -84,6 +85,40 @@ test('if title/url missing, status 400', async () => {
     .post('/api/blogs')
     .send(noTitleBlog)
     .expect(400)
+})
+
+test('deleting a blog with id', async () => {
+  const blogsAtStart = await blogListHelper.blogsInDB()
+  const deletedBlog = blogsAtStart[0]
+
+  await api
+    .delete(`/api/blogs/${deletedBlog.id}`)
+    .expect(204)
+
+  const blogsLeft = await blogListHelper.blogsInDB()
+  expect(blogsLeft).toHaveLength(blogListHelper.blogs.length - 1)
+
+  const titles = blogsLeft.map(blog => blog.title)
+  expect(titles).not.toContain(deletedBlog.title)
+})
+
+test('updating a blog for amount of likes', async () => {
+  const blogsAtStart = await blogListHelper.blogsInDB()
+  const blogForUpdate = blogsAtStart[1]
+
+  const updatedBlog = {
+    ...blogForUpdate,
+    likes: 777
+  }
+
+  await api
+    .put(`/api/blogs/${updatedBlog.id}`)
+    .send(updatedBlog)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  const blogsAtEnd = await blogListHelper.blogsInDB()
+  expect(blogsAtEnd[1].likes).toBe(777)
 })
 
 afterAll(async () => {
