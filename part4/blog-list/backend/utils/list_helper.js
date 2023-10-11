@@ -1,4 +1,5 @@
 var _ = require('lodash')
+const Blog = require('../models/blog')
 
 const listWithOneBlog = [
   {
@@ -118,6 +119,11 @@ const mostLikes = (blogs) => {
   return _.maxBy(table, (author) => author.likes)
 }
 
+const blogsInDB = async () => {
+  const blogs = await Blog.find({})
+  return blogs.map(blog => blog.toJSON())
+}
+
 module.exports = {
   listWithOneBlog,
   blogs,
@@ -125,5 +131,6 @@ module.exports = {
   totalLikes,
   favoriteBlog,
   mostBlogs,
-  mostLikes
+  mostLikes,
+  blogsInDB
 }
