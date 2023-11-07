@@ -63,6 +63,13 @@ const blogs = [
   }
 ]
 
+const users = [
+  {
+    username: "tester",
+    password: "testaburger",
+    name: "wendy"
+  }
+]
 
 const dummy = (blogs) => {
   return 1
@@ -127,6 +134,7 @@ const blogsInDB = async () => {
 module.exports = {
   listWithOneBlog,
   blogs,
+  users,
   dummy,
   totalLikes,
   favoriteBlog,
