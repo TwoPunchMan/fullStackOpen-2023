@@ -3,9 +3,8 @@ const jwt = require('jsonwebtoken')
 const blogRouter = require('express').Router()
 
 const Blog = require('../models/blog')
-const User = require('../models/user')
 
-const { tokenExtractor } = require('../utils/middleware')
+const { tokenExtractor, userExtractor } = require('../utils/middleware')
 
 blogRouter.get('/', async (req, res) => {
   const blogs = await Blog.find({})
@@ -14,49 +13,43 @@ blogRouter.get('/', async (req, res) => {
   res.json(blogs)
 })
 
-blogRouter.post('/', tokenExtractor, async (req, res) => {
-  const body = req.body
+blogRouter.post('/', userExtractor, async (req, res) => {
+  const { title, author, url, likes } = req.body
 
-  const decodedToken = jwt.verify(req.token, process.env.SECRET)
-
-  if (!decodedToken.id) {
-    return res.status(401).json({ error: 'token invalid' })
-  }
-  const user = await User.findById(decodedToken.id)
+  const user = req.user
 
   const blog = new Blog({
-    title: body.title,
-    author: body.author,
+    title,
+    author,
     user: user._id,
-    url: body.url,
-    likes: body.likes || 0
+    url,
+    likes: likes || 0
   })
 
-  if (!blog.title || !blog.url) {
-    res.status(400).end()
-  } else {
-    const newBlog = await blog.save()
-    user.blogs = user.blogs.concat(newBlog._id)
-    await user.save()
-    res.status(201).json(newBlog)
+  if (!user) {
+    return res.status(401).json({ error: 'Cannot post new blog' })
   }
+
+  const newBlog = await blog.save()
+  user.blogs = user.blogs.concat(newBlog._id)
+  await user.save()
+
+  res.status(201).json(newBlog)
 })
 
-blogRouter.delete('/:id', tokenExtractor, async (req, res) => {
+blogRouter.delete('/:id', userExtractor, async (req, res) => {
 
-  const decodedToken = jwt.verify(req.token, process.env.SECRET)
+  const user = req.user
 
-  if (!decodedToken.id || !decodedToken) {
-    return res.status(400).json({ error: 'Invalid token or user' })
-  }
-
-  const userid = decodedToken.id
   const blog = await Blog.findById(req.params.id)
 
-  if (blog.user.toString() === userid.toString()) {
-    await Blog.findByIdAndRemove(req.params.id)
-    res.status(204).end()
+  if (!user || blog.user.toString() !== user._id.toString()) {
+    return res.status(401).json({ error: 'Cannot delete blog' })
   }
+
+  await Blog.findByIdAndRemove(req.params.id)
+
+  res.status(204).end()
 })
 
 blogRouter.put('/:id', async (req, res) => {
