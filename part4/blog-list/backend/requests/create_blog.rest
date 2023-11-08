@@ -10,3 +10,16 @@ Content-Type: application/json
   "url": "http://redlipstick.com",
   "likes": 100
 }
+
+###
+POST http://localhost:3003/api/blogs HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imlsb3ZlYm93c2V0dGUiLCJpZCI6IjY1Mzg5NWM4NmE4ZmU4MDQ5ZjQ5NTQ0YiIsImlhdCI6MTY5ODk5MDUwNX0.TkOGeHMcHFyb2LMId96kkULcP5mprKTVwzVWHl4AVnI
+
+{
+  "title": "and more testing",
+  "author": "eleanor lamb",
+  "userId": "653895c86a8fe8049f49544b",
+  "url": "http://genesplicer.com",
+  "likes": 0
+}
