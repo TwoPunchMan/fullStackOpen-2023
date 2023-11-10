@@ -11,6 +11,11 @@ node_modules
 dist
 dist-ssr
 *.local
+*.env
+fly.toml
+Dockerfile
+.dockerignore
+build/
 
 # Editor directories and files
 .vscode/*
