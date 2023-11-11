@@ -4,7 +4,7 @@ const User = require('../models/user')
 
 const jwt = require('jsonwebtoken')
 
-const getTokenFrom = request => {
+const getTokenFrom = (request) => {
   const authorization = request.get('authorization')
   if (authorization && authorization.startsWith('Bearer ')) {
     return authorization.replace('Bearer ', '')
