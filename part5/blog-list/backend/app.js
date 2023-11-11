@@ -16,6 +16,8 @@ const app = express()
 
 mongoose.set('strictQuery', false)
 
+logger.info('Connecting to the MongoDB...')
+
 mongoose.connect(config.MONGODB_URI)
   .then(() => {
     logger.info('Connected to the MongoDB!')

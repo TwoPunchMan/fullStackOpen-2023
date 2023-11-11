@@ -1,5 +1,3 @@
-const jwt = require('jsonwebtoken')
-
 const blogRouter = require('express').Router()
 
 const Blog = require('../models/blog')
@@ -7,7 +5,8 @@ const Blog = require('../models/blog')
 const { userExtractor } = require('../utils/middleware')
 
 blogRouter.get('/', async (req, res) => {
-  const blogs = await Blog.find({})
+  const blogs = await Blog
+    .find({})
     .populate('user', { username: 1, name: 1 })
 
   res.json(blogs)
