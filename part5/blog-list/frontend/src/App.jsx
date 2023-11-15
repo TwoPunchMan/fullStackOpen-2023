@@ -34,12 +34,21 @@ const App = () => {
     try {
       const user = await loginService.login({ username, password })
 
+      window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
+
+      blogService.setToken(user.token)
       setUser(user)
       setUserName('')
       setPassword('')
     } catch (exception) {
       console.log(exception)
     }
+  }
+
+  const handleLogout = () => {
+    window.localStorage.removeItem('loggedBlogAppUser')
+    blogService.setToken(null)
+    setUser(null)
   }
 
   const loginForm = () => {
@@ -57,6 +66,8 @@ const App = () => {
     )
   }
 
+
+
   if (user === null) {
     return loginForm()
   }
@@ -65,7 +76,9 @@ const App = () => {
     <div>
       <h2>blogs</h2>
 
-      <div>{user.name} logged in</div>
+      <div>{user.name} logged in
+        <button onClick={handleLogout}>logout</button>
+      </div>
       <br></br>
 
       {blogs.map(blog =>
