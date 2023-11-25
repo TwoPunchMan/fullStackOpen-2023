@@ -63,12 +63,10 @@ const App = () => {
     blogService
       .create(blogObject)
       .then(returnedBlog => {
-        console.log(returnedBlog)
         setBlogs(blogs.concat(returnedBlog))
-        handleMsg(`a new blog ${title} by ${author} added`, 'success')
+        handleMsg(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`, 'success')
       })
       .catch(error => {
-        console.log('wtf')
         handleMsg('something is wrong with the title/author', 'error')
       })
   }
