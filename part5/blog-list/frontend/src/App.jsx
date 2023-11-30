@@ -64,10 +64,26 @@ const App = () => {
       .create(blogObject)
       .then(returnedBlog => {
         setBlogs(blogs.concat(returnedBlog))
+        console.log(returnedBlog)
         handleMsg(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`, 'success')
       })
       .catch(error => {
         handleMsg('something is wrong with the title/author', 'error')
+      })
+  }
+
+  const addLikesToBlog = (blogId) => {
+    const blog = blogs.find(b => b.id === blogId)
+    console.log('addlikes', blog)
+    const updatedBlog = { ...blog, likes: blog.likes + 1 }
+
+    blogService
+      .updateBlog(blogId, updatedBlog)
+      .then(returnedBlog => {
+        setBlogs(blogs.map(blog => blog.id !== blogId ? blog : returnedBlog))
+      })
+      .catch(error => {
+        handleMsg("Can't add a like to this blog", 'error')
       })
   }
 
@@ -125,7 +141,7 @@ const App = () => {
       }
 
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} addLike={addLikesToBlog} />
       )}
     </div>
   )
