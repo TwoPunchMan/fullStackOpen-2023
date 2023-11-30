@@ -20,9 +20,10 @@ const App = () => {
   useEffect(() => {
     blogService
       .getAll()
-      .then(blogs =>
+      .then(blogs => {
+        blogs.sort((a, b) => b.likes - a.likes)
         setBlogs(blogs)
-      )
+      })
   }, [])
 
   useEffect(() => {
@@ -64,7 +65,6 @@ const App = () => {
       .create(blogObject)
       .then(returnedBlog => {
         setBlogs(blogs.concat(returnedBlog))
-        console.log(returnedBlog)
         handleMsg(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`, 'success')
       })
       .catch(error => {
@@ -74,17 +74,35 @@ const App = () => {
 
   const addLikesToBlog = (blogId) => {
     const blog = blogs.find(b => b.id === blogId)
-    console.log('addlikes', blog)
+
     const updatedBlog = { ...blog, likes: blog.likes + 1 }
 
     blogService
       .updateBlog(blogId, updatedBlog)
       .then(returnedBlog => {
-        setBlogs(blogs.map(blog => blog.id !== blogId ? blog : returnedBlog))
+        setBlogs(blogs
+          .map(blog => blog.id !== blogId ? blog : returnedBlog)
+          .sort((a, b) => b.likes - a.likes))
       })
       .catch(error => {
         handleMsg("Can't add a like to this blog", 'error')
       })
+  }
+
+  const deleteBlog = (blogToDelete) => {
+    const confirmDelete = window.confirm(`Remove blog ${blogToDelete.title} by ${blogToDelete.author}?`)
+    if (confirmDelete) {
+      blogService
+        .deleteBlog(blogToDelete.id)
+        .then(() => {
+          handleMsg(`Deleted the blog ${blogToDelete.title} by ${blogToDelete.author}`, 'info')
+          const undeletedBlogs = blogs.filter(blog => blog.id !== blogId)
+          setBlogs(undeletedBlogs)
+        })
+        .catch(error => {
+          handleMsg('Blog has already been deleted', 'error')
+        })
+    }
   }
 
   const handleMsg = (msg, type) => {
@@ -141,7 +159,7 @@ const App = () => {
       }
 
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} addLike={addLikesToBlog} />
+        <Blog key={blog.id} blog={blog} functions={[addLikesToBlog, deleteBlog]} />
       )}
     </div>
   )

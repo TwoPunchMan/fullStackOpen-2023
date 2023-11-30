@@ -41,7 +41,7 @@ blogRouter.post('/', userExtractor, async (req, res) => {
 })
 
 blogRouter.delete('/:id', userExtractor, async (req, res) => {
-
+  console.log('method o delete')
   const user = req.user
 
   const blog = await Blog.findById(req.params.id)
@@ -67,9 +67,11 @@ blogRouter.put('/:id', async (req, res) => {
     id: blog._id
   }
 
-  await Blog.findByIdAndUpdate(req.params.id, updatedBlog)
+  const updatedNewBlog = await Blog
+    .findByIdAndUpdate(req.params.id, updatedBlog, { new: true })
+    .populate('user', { username: 1, name: 1 })
 
-  res.status(200).json(updatedBlog)
+  res.status(200).json(updatedNewBlog)
 })
 
 module.exports = blogRouter
