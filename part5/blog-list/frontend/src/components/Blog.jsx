@@ -4,8 +4,10 @@ const Blog = (props) => {
   const [visible, setVisible] = useState(false)
   const [amtLikes, setLikes] = useState(0)
   const [blogCreator, setCreator] = useState(null)
+  const [loggedInUser, setLoggedInUser] = useState(null)
 
   const { title, author, user, url, likes, id } = props.blog
+  const [ addLike, deleteBlog ] = props.functions
 
   const blogStyle = {
     paddingTop: 10,
@@ -18,21 +20,26 @@ const Blog = (props) => {
   useEffect(() => {
     setCreator(user.name)
     setLikes(likes)
-  })
+    setLoggedInUser(props.loggedInUser)
+  }, [])
 
-  const addLike = () => {
-    const addLike = props.functions[0]
+  const hideVisible = { display: visible ? 'none' : '' }
+  const showVisible = { display: visible ? '' : 'none' }
+
+  const displayRemoveBtn = {
+    display: !loggedInUser || loggedInUser.name !== user.name
+      ? 'none'
+      : ''
+  }
+
+  const upVote = () => {
     addLike(id)
     setLikes(amtLikes + 1)
   }
 
-  const deleteBlog = () => {
-    const deleteBlog = props.functions[1]
+  const removeBlog = () => {
     deleteBlog(props.blog)
   }
-
-  const hideVisible = { display: visible ? 'none' : '' }
-  const showVisible = { display: visible ? '' : 'none' }
 
   const toggleDetails = () => {
     setVisible(!visible)
@@ -44,11 +51,11 @@ const Blog = (props) => {
         {title} {author} <button onClick={toggleDetails}>view</button>
       </div>
       <div style={showVisible}>
-        {title} {author} <button onClick={toggleDetails}>hide</button><br></br>
-        <a href={url}>{url}</a><br></br>
-        likes {amtLikes} <button onClick={addLike}>like</button><br></br>
-        {blogCreator}<br></br>
-        <button onClick={() => deleteBlog()}>remove</button>
+        {title} {author} <button onClick={toggleDetails}>hide</button><br/>
+        <a href={url}>{url}</a><br/>
+        likes {amtLikes} <button onClick={upVote}>like</button><br/>
+        {blogCreator}<br/>
+        <button style={displayRemoveBtn} onClick={removeBlog}>remove</button>
       </div>
     </div>
   )

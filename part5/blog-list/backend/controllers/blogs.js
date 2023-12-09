@@ -1,5 +1,5 @@
 const blogRouter = require('express').Router()
-
+const jwt = require('jsonwebtoken')
 const Blog = require('../models/blog')
 
 const { userExtractor } = require('../utils/middleware')
@@ -41,16 +41,19 @@ blogRouter.post('/', userExtractor, async (req, res) => {
 })
 
 blogRouter.delete('/:id', userExtractor, async (req, res) => {
-  console.log('method o delete')
-  const user = req.user
+  console.log('body', req)
+  const blogId = req.params.id
+  console.log('user', req.user)
+  const blog = await Blog.findById(blogId)
 
-  const blog = await Blog.findById(req.params.id)
-
-  if (!user || blog.user.toString() !== user._id.toString()) {
+  if (!blog || blog.user.toString() !== blogId.toString()) {
+    console.log('blog', blog)
+    console.log('usertostring', blog.user.toString())
+    console.log('blogid', blogId.toString())
     return res.status(401).json({ error: 'Cannot delete blog' })
   }
 
-  await Blog.findByIdAndRemove(req.params.id)
+  await Blog.findByIdAndRemove(blogId)
 
   res.status(204).end()
 })

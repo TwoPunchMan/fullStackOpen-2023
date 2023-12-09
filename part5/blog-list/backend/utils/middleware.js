@@ -21,6 +21,7 @@ const getTokenFrom = (req) => {
 
   return null
 }
+
 const tokenExtractor = (req, res, next) => {
   req.token = getTokenFrom(req)
   next()
@@ -36,6 +37,7 @@ const userExtractor = async (req, res, next) => {
     }
 
     req.user = await User.findById(decodedToken.id)
+    console.log('requser', req.user)
   }
 
   next()
@@ -55,7 +57,7 @@ const errorHandler = (error, req, res, next) => {
   } else if (error.name === 'ValidationError') {
     return res.status(400).json({ error: error.message })
   } else if (error.name === 'JsonWebTokenError') {
-    return res.status(401).json({ error: error.message })
+    return res.status(401).json({ error: 'token missing or invalid' })
   }
 
   next(error)
