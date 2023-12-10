@@ -9,6 +9,7 @@ import LoginForm from './components/LoginForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import storageService from './services/storage'
+import userService from './services/user'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -26,7 +27,7 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    const user = storageService.loadUser()
+    const user = userService.loadUser()
     setUser(user)
   }, [])
 
@@ -42,35 +43,29 @@ const App = () => {
     blogFormRef.current.toggleVisibility()
   }
 
-  const addLikesToBlog = (blogId) => {
-    const blog = blogs.find(b => b.id === blogId)
+  const like = async (blog) => {
+    const updatedBlog = { ...blog, likes: blog.likes + 1, user: blog.user.id }
 
-    const updatedBlog = { ...blog, likes: blog.likes + 1 }
-
-    blogService
-      .updateBlog(blogId, updatedBlog)
-      .then(returnedBlog => {
-        setBlogs(blogs.map(blog => blog.id !== blogId ? blog : returnedBlog))
-      })
-      .catch(error => {
-        handleMsg("Can't add a like to this blog", 'error')
-      })
+    try {
+      await blogService.updateBlog(updatedBlog)
+      setBlogs(blogs.map(b => b.id === blog.id ? updatedBlog : b))
+      handleMsg(`+1 like to the blog ${blog.title} by ${blog.author}`, 'success')
+    } catch (error) {
+      handleMsg("Can't add a like to this blog", 'error')
+    }
   }
 
-  const deleteBlog = (blogToDelete) => {
+  const deleteBlog = async(blogToDelete) => {
     const confirmDelete = window.confirm(`Remove blog ${blogToDelete.title} by ${blogToDelete.author}?`)
+
     if (confirmDelete) {
-      blogService
-        .deleteBlog(blogToDelete.id)
-        .then(deletedBlog => {
-          console.log('delblog', deletedBlog)
-          const undeletedBlogs = blogs.filter(blog => blog.id !== blogId)
-          setBlogs(undeletedBlogs)
-          handleMsg(`Deleted the blog ${blogToDelete.title} by ${blogToDelete.author}`, 'info')
-        })
-        .catch(error => {
-          handleMsg('Blog has already been deleted', 'error')
-        })
+      try {
+        await blogService.deleteBlog(blogToDelete.id)
+        setBlogs(blogs.filter(blog => blog.id !== blogToDelete.id))
+        handleMsg(`Deleted the blog ${blogToDelete.title} by ${blogToDelete.author}`, 'success')
+      } catch (error) {
+        handleMsg('Blog has already been deleted', 'error')
+      }
     }
   }
 
@@ -88,6 +83,7 @@ const App = () => {
   const login = async (username, password) => {
     try {
       const user = await loginService.login({ username, password })
+      userService.saveUser(user)
       setUser(user)
     } catch (error) {
       handleMsg('wrong username or password', 'error')
@@ -96,6 +92,7 @@ const App = () => {
 
   const logout = async () => {
     handleMsg(`${user.username} has logged out`, 'success')
+    userService.removeUser()
     setUser(null)
   }
 
@@ -130,8 +127,9 @@ const App = () => {
           <Blog
             key={blog.id}
             blog={blog}
-            functions={[addLikesToBlog, deleteBlog]}
-            loggedInUser={user}
+            upLike={() => like(blog)}
+            remove={() => deleteBlog(blog)}
+            isRemove={user && blog.user.name === user.name}
           />
         )}
       </div>

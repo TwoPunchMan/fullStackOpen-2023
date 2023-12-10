@@ -4,12 +4,12 @@ const STORAGE_KEY = 'loggedBlogAppUser'
 
 const getToken = () => token
 
-const setUser = (user) => {
+const saveUser = (user) => {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(user))
   token = user.token
 }
 
-const getUser = () => {
+const loadUser = () => {
   const loggedUserJSON = window.localStorage.getItem(STORAGE_KEY)
 
   if (loggedUserJSON) {
@@ -27,8 +27,8 @@ const removeUser = () => {
 }
 
 export default {
-  setUser,
-  getUser,
+  saveUser,
+  loadUser,
   removeUser,
   getToken
 }
