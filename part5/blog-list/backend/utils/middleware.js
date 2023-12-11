@@ -37,7 +37,6 @@ const userExtractor = async (req, res, next) => {
     }
 
     req.user = await User.findById(decodedToken.id)
-    console.log('requser', req.user)
   }
 
   next()

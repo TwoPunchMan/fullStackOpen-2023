@@ -23,7 +23,7 @@ const Blog = ({ blog, upLike, remove, isRemove }) => {
         <div>
           <div> <a href={url}>{url}</a></div>
           <div>likes {likes} <button onClick={upLike}>like</button></div>
-          <div>{user.name}</div>
+          <div>{user.username}</div>
           {isRemove &&
             <div>
               <button onClick={remove}>remove</button>

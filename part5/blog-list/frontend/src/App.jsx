@@ -8,7 +8,6 @@ import LoginForm from './components/LoginForm'
 
 import blogService from './services/blogs'
 import loginService from './services/login'
-import storageService from './services/storage'
 import userService from './services/user'
 
 const App = () => {
@@ -129,7 +128,7 @@ const App = () => {
             blog={blog}
             upLike={() => like(blog)}
             remove={() => deleteBlog(blog)}
-            isRemove={user && blog.user.name === user.name}
+            isRemove={user && blog.user.username === user.username}
           />
         )}
       </div>

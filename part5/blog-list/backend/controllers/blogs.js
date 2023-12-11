@@ -1,5 +1,5 @@
 const blogRouter = require('express').Router()
-const jwt = require('jsonwebtoken')
+
 const Blog = require('../models/blog')
 
 const { userExtractor } = require('../utils/middleware')
@@ -15,19 +15,20 @@ blogRouter.get('/', async (req, res) => {
 blogRouter.post('/', userExtractor, async (req, res) => {
   const { title, author, url, likes } = req.body
 
-  const user = req.user
-
   const blog = new Blog({
     title,
     author,
-    user: user._id,
     url,
     likes: likes || 0
   })
 
+  const user = req.user
+  console.log(user)
   if (!user) {
     return res.status(401).json({ error: 'Cannot post new blog' })
   }
+
+  blog.user = user._id
 
   const newBlog = await blog.save()
   user.blogs = user.blogs.concat(newBlog._id)
@@ -35,9 +36,29 @@ blogRouter.post('/', userExtractor, async (req, res) => {
 
   const updatedNewBlog = await Blog
     .findById(newBlog._id)
-    .populate('user', { username: 1, name: 1 })
-
+    .populate('user')
+  console.log('upup', updatedNewBlog)
   res.status(201).json(updatedNewBlog)
+})
+
+blogRouter.put('/:id', async (req, res) => {
+  const blog = await Blog.findById(req.params.id)
+  console.log('addlike', blog)
+  console.log('reqbody', req.body)
+  const updatedBlog = {
+    user: blog.user._id,
+    title: blog.title,
+    author: blog.author,
+    url: blog.url,
+    likes: req.body.likes,
+    id: blog._id
+  }
+
+  const updatedNewBlog = await Blog
+    .findByIdAndUpdate(req.params.id, updatedBlog, { new: true })
+    .populate('user')
+  console.log('updated', updatedNewBlog)
+  res.status(200).json(updatedNewBlog)
 })
 
 blogRouter.delete('/:id', userExtractor, async (req, res) => {
@@ -56,25 +77,6 @@ blogRouter.delete('/:id', userExtractor, async (req, res) => {
   await Blog.findByIdAndRemove(blogId)
 
   res.status(204).end()
-})
-
-blogRouter.put('/:id', async (req, res) => {
-  const blog = await Blog.findById(req.params.id)
-
-  const updatedBlog = {
-    user: blog.user._id,
-    title: blog.title,
-    author: blog.author,
-    url: blog.url,
-    likes: req.body.likes,
-    id: blog._id
-  }
-
-  const updatedNewBlog = await Blog
-    .findByIdAndUpdate(req.params.id, updatedBlog, { new: true })
-    .populate('user', { username: 1, name: 1 })
-
-  res.status(200).json(updatedNewBlog)
 })
 
 module.exports = blogRouter
