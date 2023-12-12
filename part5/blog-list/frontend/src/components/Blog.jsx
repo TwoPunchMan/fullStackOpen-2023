@@ -1,9 +1,16 @@
 import { useState, useEffect } from "react"
 
-const Blog = ({ blog, upLike, remove, isRemove }) => {
+const Blog = ({ blog, upLike, remove, loginUser }) => {
   const [visible, setVisible] = useState(false)
+  const [isDelete, setDeleteBtn] = useState(false)
 
   const { title, author, user, url, likes } = blog
+
+  useEffect(() => {
+    if (loginUser.username === user.username) {
+      setDeleteBtn(true)
+    }
+  }, [])
 
   const blogStyle = {
     paddingTop: 10,
@@ -24,7 +31,7 @@ const Blog = ({ blog, upLike, remove, isRemove }) => {
           <div> <a href={url}>{url}</a></div>
           <div>likes {likes} <button onClick={upLike}>like</button></div>
           <div>{user.username}</div>
-          {isRemove &&
+          {isDelete &&
             <div>
               <button onClick={remove}>remove</button>
             </div>

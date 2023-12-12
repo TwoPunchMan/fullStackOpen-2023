@@ -43,24 +43,27 @@ const App = () => {
   }
 
   const like = async (blog) => {
-    const updatedBlog = { ...blog, likes: blog.likes + 1, user: blog.user.id }
+    const blogForUpdate = { ...blog, likes: blog.likes + 1, user: blog.user.id }
 
     try {
-      await blogService.updateBlog(updatedBlog)
-      setBlogs(blogs.map(b => b.id === blog.id ? updatedBlog : b))
-      handleMsg(`+1 like to the blog ${blog.title} by ${blog.author}`, 'success')
+      const likedBlog = await blogService.updateBlog(blogForUpdate)
+      const updatedBlogs = blogs.map(b => b.id === blog.id ? likedBlog : b)
+      setBlogs(updatedBlogs)
+      handleMsg(`+1 like to the blog '${blog.title}' by '${blog.author}'`, 'success')
     } catch (error) {
       handleMsg("Can't add a like to this blog", 'error')
     }
   }
 
   const deleteBlog = async(blogToDelete) => {
+    console.log(blogToDelete)
     const confirmDelete = window.confirm(`Remove blog ${blogToDelete.title} by ${blogToDelete.author}?`)
 
     if (confirmDelete) {
       try {
         await blogService.deleteBlog(blogToDelete.id)
-        setBlogs(blogs.filter(blog => blog.id !== blogToDelete.id))
+        const updatedBlogs = blogs.filter(blog => blog.id !== blogToDelete.id)
+        setBlogs(updatedBlogs)
         handleMsg(`Deleted the blog ${blogToDelete.title} by ${blogToDelete.author}`, 'success')
       } catch (error) {
         handleMsg('Blog has already been deleted', 'error')
@@ -128,7 +131,7 @@ const App = () => {
             blog={blog}
             upLike={() => like(blog)}
             remove={() => deleteBlog(blog)}
-            isRemove={user && blog.user.username === user.username}
+            loginUser={user}
           />
         )}
       </div>

@@ -23,7 +23,7 @@ blogRouter.post('/', userExtractor, async (req, res) => {
   })
 
   const user = req.user
-  console.log(user)
+
   if (!user) {
     return res.status(401).json({ error: 'Cannot post new blog' })
   }
@@ -37,40 +37,36 @@ blogRouter.post('/', userExtractor, async (req, res) => {
   const updatedNewBlog = await Blog
     .findById(newBlog._id)
     .populate('user')
-  console.log('upup', updatedNewBlog)
+
   res.status(201).json(updatedNewBlog)
 })
 
 blogRouter.put('/:id', async (req, res) => {
+  const body = req.body
   const blog = await Blog.findById(req.params.id)
-  console.log('addlike', blog)
-  console.log('reqbody', req.body)
-  const updatedBlog = {
-    user: blog.user._id,
+
+  const updateBlog = {
     title: blog.title,
     author: blog.author,
     url: blog.url,
-    likes: req.body.likes,
-    id: blog._id
+    likes: body.likes,
+    id: req.params.id
   }
 
-  const updatedNewBlog = await Blog
-    .findByIdAndUpdate(req.params.id, updatedBlog, { new: true })
-    .populate('user')
-  console.log('updated', updatedNewBlog)
-  res.status(200).json(updatedNewBlog)
+  let updatedBlog = await Blog
+    .findByIdAndUpdate(req.params.id, updateBlog, { new: true })
+  updatedBlog = await Blog.findById(updatedBlog._id).populate('user')
+
+  res.status(200).json(updatedBlog)
 })
 
 blogRouter.delete('/:id', userExtractor, async (req, res) => {
-  console.log('body', req)
   const blogId = req.params.id
-  console.log('user', req.user)
+  const loginUser = req.user
+
   const blog = await Blog.findById(blogId)
 
-  if (!blog || blog.user.toString() !== blogId.toString()) {
-    console.log('blog', blog)
-    console.log('usertostring', blog.user.toString())
-    console.log('blogid', blogId.toString())
+  if (!blog || blog.user.toString() !== loginUser._id.toString()) {
     return res.status(401).json({ error: 'Cannot delete blog' })
   }
 
