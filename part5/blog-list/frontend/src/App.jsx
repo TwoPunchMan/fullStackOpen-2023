@@ -131,7 +131,7 @@ const App = () => {
             blog={blog}
             upLike={() => like(blog)}
             remove={() => deleteBlog(blog)}
-            loginUser={user}
+            isRemove={user && blog.user.username === user.username}
           />
         )}
       </div>

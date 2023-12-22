@@ -1,16 +1,9 @@
 import { useState, useEffect } from "react"
 
-const Blog = ({ blog, upLike, remove, loginUser }) => {
+const Blog = ({ blog, upLike, remove, isRemove }) => {
   const [visible, setVisible] = useState(false)
-  const [isDelete, setDeleteBtn] = useState(false)
 
   const { title, author, user, url, likes } = blog
-
-  useEffect(() => {
-    if (loginUser.username === user.username) {
-      setDeleteBtn(true)
-    }
-  }, [])
 
   const blogStyle = {
     paddingTop: 10,
@@ -20,10 +13,14 @@ const Blog = ({ blog, upLike, remove, loginUser }) => {
     marginBottom: 5
   }
 
+  handleVisible = () => {
+    setVisible(!visible)
+  }
+
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className="blog">
       {title} {author}
-      <button onClick={() => setVisible(!visible)}>
+      <button onClick={handleVisible}>
         {visible ? 'show' : 'hide'}
       </button>
       {visible &&
@@ -31,7 +28,7 @@ const Blog = ({ blog, upLike, remove, loginUser }) => {
           <div> <a href={url}>{url}</a></div>
           <div>likes {likes} <button onClick={upLike}>like</button></div>
           <div>{user.username}</div>
-          {isDelete &&
+          {isRemove &&
             <div>
               <button onClick={remove}>remove</button>
             </div>
