@@ -12,6 +12,15 @@ describe('Note app', function() {
     cy.contains('log in').click()
   })
 
+  it('user can log in', function() {
+    cy.contains('log in').click()
+    cy.get('#username').type('user')
+    cy.get('#password').type('secret')
+    cy.get('#login-btn').click()
+
+    cy.contains('Test user logged in')
+  })
+
   describe('when logged in', function() {
     beforeEach(function() {
       cy.contains('log in').click()
