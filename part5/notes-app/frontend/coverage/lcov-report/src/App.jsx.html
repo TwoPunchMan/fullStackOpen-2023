@@ -15,41 +15,41 @@
         }
     </style>
 </head>
-    
+
 <body>
 <div class='wrapper'>
     <div class='pad1'>
         <h1><a href="../index.html">All files</a> / <a href="index.html">src</a> App.jsx</h1>
         <div class='clearfix'>
-            
+
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
                 <span class='fraction'>0/60</span>
             </div>
-        
-            
+
+
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
                 <span class='fraction'>0/16</span>
             </div>
-        
-            
+
+
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
                 <span class='fraction'>0/24</span>
             </div>
-        
-            
+
+
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
                 <span class='fraction'>0/58</span>
             </div>
-        
-            
+
+
         </div>
         <p class="quiet">
             Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
@@ -399,7 +399,7 @@ const App = <span class="cstat-no" title="statement not covered" ><span class="f
   }, [])
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
-    const loggedUserJSON = <span class="cstat-no" title="statement not covered" >window.localStorage.getItem('loggedNoteappUser')</span>
+    const loggedUserJSON = <span class="cstat-no" title="statement not covered" >window.localStorage.getItem('loggedNoteAppUser')</span>
 <span class="cstat-no" title="statement not covered" >    if (loggedUserJSON) {</span>
       const user = <span class="cstat-no" title="statement not covered" >JSON.parse(loggedUserJSON)</span>
 <span class="cstat-no" title="statement not covered" >      setUser(user)</span>
@@ -445,7 +445,7 @@ const App = <span class="cstat-no" title="statement not covered" ><span class="f
       })
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      window.localStorage.setItem(</span>
-        'loggedNoteappUser', JSON.stringify(user)
+        'loggedNoteAppUser', JSON.stringify(user)
       )
 <span class="cstat-no" title="statement not covered" >      noteService.setToken(user.token)</span>
 <span class="cstat-no" title="statement not covered" >      setUser(user)</span>
@@ -544,4 +544,3 @@ export default App</pre></td></tr></table></pre>
         <script src="../block-navigation.js"></script>
     </body>
 </html>
-    
