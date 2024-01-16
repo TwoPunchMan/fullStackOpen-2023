@@ -35,4 +35,41 @@ describe('Blog app', function() {
         .and('have.css', 'border-style', 'solid')
     })
   })
+
+  describe('When logged in', function() {
+    beforeEach(function() {
+      cy.login({ username: 'theYesMan', password: 'nukethencr' })
+    })
+
+    it('A blog can be created', function() {
+      cy.contains('new blog').click()
+      cy.contains('create new blog')
+      cy.get('#title').type('Big Iron on your hip')
+      cy.get('#author').type('Marty Robbins')
+      cy.get('#url').type('http://falloutnewvegas.com')
+      cy.get('#create-blog-btn').click()
+
+      cy.contains('A new blog Big Iron on your hip by Marty Robbins added')
+    })
+
+    describe('And a blog exists', function() {
+      beforeEach(function() {
+        cy.createBlog({
+          title: 'Piper mods',
+          author: 'Nora Nate',
+          url: 'http://www.blockchain.net'
+        })
+      })
+
+      it('Like a blog', function() {
+        cy.contains('show').click()
+        cy.get('#like-btn').click()
+        cy.contains("+1 like to the blog 'Piper mods' by 'Nora Nate' added")
+      })
+    })
+
+
+  })
+
+
 })

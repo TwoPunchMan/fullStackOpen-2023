@@ -13,7 +13,7 @@ const Blog = ({ blog, upLike, remove, isRemove }) => {
     marginBottom: 5
   }
 
-  handleVisible = () => {
+  const handleVisible = () => {
     setVisible(!visible)
   }
 
@@ -21,12 +21,12 @@ const Blog = ({ blog, upLike, remove, isRemove }) => {
     <div style={blogStyle} className="blog">
       {title} {author}
       <button onClick={handleVisible}>
-        {visible ? 'show' : 'hide'}
+        {visible ? 'hide' : 'show'}
       </button>
       {visible &&
         <div>
           <div> <a href={url}>{url}</a></div>
-          <div>likes {likes} <button onClick={upLike}>like</button></div>
+          <div>likes {likes} <button id="like-btn" onClick={upLike}>like</button></div>
           <div>{user.username}</div>
           {isRemove &&
             <div>
