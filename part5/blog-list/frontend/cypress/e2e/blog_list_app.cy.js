@@ -59,17 +59,85 @@ describe('Blog app', function() {
           author: 'Nora Nate',
           url: 'http://www.blockchain.net'
         })
+        cy.createBlog({
+          title: 'Defense of hoover dam',
+          author: 'James Hsu',
+          url: 'http://www.l33tc0de.com'
+        })
+        cy.createBlog({
+          title: 'Programming C++',
+          author: 'Gary Clemens',
+          url: 'http://www.dogcoin.com'
+        })
       })
 
       it('Like a blog', function() {
-        cy.contains('show').click()
+        cy.contains('Piper mods').contains('show').click()
         cy.get('#like-btn').click()
-        cy.contains("+1 like to the blog 'Piper mods' by 'Nora Nate' added")
+        cy.contains("+1 like to the blog 'Piper mods' by 'Nora Nate'")
       })
     })
-
-
   })
 
+  describe('Multiple users', function() {
+    beforeEach(function() {
+      cy.request('POST', `${Cypress.env('BACKEND')}/testing/reset`)
+      const userOne = {
+        username: 'theYesMan',
+        password: 'nukethencr',
+        name: 'Marty Robbins'
+      }
+      const userTwo = {
+        username: 'syonBoy',
+        password: 'anyaDog',
+        name: 'Anya Forger'
+      }
 
+      cy.request('POST', `${Cypress.env('BACKEND')}/users`, userOne)
+      cy.request('POST', `${Cypress.env('BACKEND')}/users`, userTwo)
+      cy.visit('')
+    })
+
+    describe('logged in as Yes Man', function() {
+      beforeEach(function() {
+        cy.login({ username: 'theYesMan', password: 'nukethencr' })
+        cy.createBlog({
+          title: 'Piper mods',
+          author: 'Nora Nate',
+          url: 'http://www.blockchain.net'
+        })
+        cy.createBlog({
+          title: 'Defense of hoover dam',
+          author: 'James Hsu',
+          url: 'http://www.l33tc0de.com'
+        })
+        cy.contains('logout').click()
+        cy.login({ username: 'syonBoy', password: 'anyaDog' })
+        cy.createBlog({
+          title: 'Programming C++',
+          author: 'Gary Clemens',
+          url: 'http://www.dogcoin.com'
+        })
+        cy.contains('logout').click()
+        cy.login({ username: 'theYesMan', password: 'nukethencr' })
+      })
+
+      it('Deleting blogs only for Yes Man', function() {
+        cy.contains('Piper mods').parent().find('button').as('show-btn')
+        cy.get('@show-btn').click()
+        cy.contains('Piper mods').parent()
+          .should('contain', 'remove')
+      })
+
+      it('Deleting blogs only for syon-boy', function() {
+        cy.contains('logout').click()
+        cy.login({ username: 'syonBoy', password: 'anyaDog' })
+
+        cy.contains('Programming C++').parent().find('button').as('show-btn')
+        cy.get('@show-btn').click()
+        cy.contains('Programming C++').parent()
+          .should('contain', 'remove')
+      })
+    })
+  })
 })
