@@ -1,12 +1,18 @@
 describe('Blog app', function() {
   beforeEach(function() {
     cy.request('POST', `${Cypress.env('BACKEND')}/testing/reset`)
-    const user = {
+    const userOne = {
       username: 'theYesMan',
       password: 'nukethencr',
       name: 'Marty Robbins'
     }
-    cy.request('POST', `${Cypress.env('BACKEND')}/users`, user)
+    const userTwo = {
+      username: 'syonBoy',
+      password: 'anyaDog',
+      name: 'Anya Forger'
+    }
+    cy.request('POST', `${Cypress.env('BACKEND')}/users`, userOne)
+    cy.request('POST', `${Cypress.env('BACKEND')}/users`, userTwo)
     cy.visit('')
   })
 
@@ -80,24 +86,6 @@ describe('Blog app', function() {
   })
 
   describe('Multiple users', function() {
-    beforeEach(function() {
-      cy.request('POST', `${Cypress.env('BACKEND')}/testing/reset`)
-      const userOne = {
-        username: 'theYesMan',
-        password: 'nukethencr',
-        name: 'Marty Robbins'
-      }
-      const userTwo = {
-        username: 'syonBoy',
-        password: 'anyaDog',
-        name: 'Anya Forger'
-      }
-
-      cy.request('POST', `${Cypress.env('BACKEND')}/users`, userOne)
-      cy.request('POST', `${Cypress.env('BACKEND')}/users`, userTwo)
-      cy.visit('')
-    })
-
     describe('logged in as Yes Man', function() {
       beforeEach(function() {
         cy.login({ username: 'theYesMan', password: 'nukethencr' })
@@ -106,11 +94,6 @@ describe('Blog app', function() {
           author: 'Nora Nate',
           url: 'http://www.blockchain.net'
         })
-        cy.createBlog({
-          title: 'Defense of hoover dam',
-          author: 'James Hsu',
-          url: 'http://www.l33tc0de.com'
-        })
         cy.contains('logout').click()
         cy.login({ username: 'syonBoy', password: 'anyaDog' })
         cy.createBlog({
@@ -119,68 +102,70 @@ describe('Blog app', function() {
           url: 'http://www.dogcoin.com'
         })
         cy.contains('logout').click()
-        cy.login({ username: 'theYesMan', password: 'nukethencr' })
       })
 
       it('Deleting blogs only for Yes Man', function() {
-        cy.contains('Piper mods').parent().find('button').as('show-btn')
-        cy.get('@show-btn').click()
-        cy.contains('Piper mods').parent()
-          .should('contain', 'remove')
+        cy.login({ username: 'theYesMan', password: 'nukethencr' })
+        cy.contains('show').click()
+        cy.contains('remove').click()
       })
 
-      it('Deleting blogs only for syon-boy', function() {
-        cy.contains('logout').click()
-        cy.login({ username: 'syonBoy', password: 'anyaDog' })
-
-        cy.contains('Programming C++').parent().find('button').as('show-btn')
-        cy.get('@show-btn').click()
-        cy.contains('Programming C++').parent()
-          .should('contain', 'remove')
+      it('Cannot delete Programming C++ as Yes Man', function() {
+        cy.login({ username: 'theYesMan', password: 'nukethencr' })
+        cy.contains('Programming C++').contains('show').click()
+        cy.contains('remove').should('not.exist')
       })
     })
 
     describe('Blog with the most likes', function() {
-      beforeEach(function() {
-        cy.login({ username: 'theYesMan', password: 'nukethencr' })
-        cy.createBlog({
+      const blogs = [
+        {
           title: 'Piper mods',
           author: 'Nora Nate',
           url: 'http://www.blockchain.net'
-        })
-        cy.createBlog({
+        },
+        {
           title: 'Defense of hoover dam',
           author: 'James Hsu',
           url: 'http://www.l33tc0de.com'
-        })
-        cy.contains('logout').click()
-        cy.login({ username: 'syonBoy', password: 'anyaDog' })
-        cy.createBlog({
+        },
+        {
           title: 'Programming C++',
           author: 'Gary Clemens',
           url: 'http://www.dogcoin.com'
-        })
-        cy.contains('logout').click()
+        }
+      ]
+
+      beforeEach(function() {
         cy.login({ username: 'theYesMan', password: 'nukethencr' })
+        cy.createBlog(blogs[0])
+        cy.createBlog(blogs[1])
+        cy.createBlog(blogs[2])
       })
 
-      it('Blog with most likes has 3 votes; second most with 2 votes', function() {
-        cy.contains('Defense of hoover dam').parent().find('button').as('show-btn')
-        cy.get('@show-btn').click()
+      it('Blogs sorted according to the most likes top-down', function() {
+        cy.contains(blogs[0].title).contains('show').click()
+        cy.contains(blogs[0].title).contains('like').as('like1')
 
-        cy.contains('Defense of hoover dam').parent().find('#like-btn').as('like-btn')
-        cy.get('@like-btn').click().click().click()
+        cy.contains(blogs[1].title).contains('show').click()
+        cy.contains(blogs[1].title).contains('like').as('like2')
 
-        cy.contains('Programming C++').parent().find('button').as('show-btn')
-        cy.get('@show-btn').click()
+        cy.contains(blogs[2].title).contains('show').click()
+        cy.contains(blogs[2].title).contains('like').as('like3')
 
-        cy.contains('Programming C++').parent().find('#like-btn').as('like-btn')
-        cy.get('@like-btn').click().click()
+        cy.get('@like3').click()
+        cy.get('@like3').click()
+        cy.get('@like3').click()
+        cy.get('@like3').click()
 
-        setTimeout([], 5000)
+        cy.get('@like2').click()
+        cy.get('@like2').click()
 
-        cy.get('.blog').eq(0).should('contain', 'Defense of hoover dam')
-        cy.get('.blog').eq(1).should('contain', 'Programming C++')
+        cy.get('@like1').click()
+
+        cy.get('.blog').eq(0).should('contain', blogs[2].title)
+        cy.get('.blog').eq(1).should('contain', blogs[1].title)
+        cy.get('.blog').eq(2).should('contain', blogs[0].title)
       })
     })
   })
