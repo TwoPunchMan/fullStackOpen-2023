@@ -139,5 +139,49 @@ describe('Blog app', function() {
           .should('contain', 'remove')
       })
     })
+
+    describe('Blog with the most likes', function() {
+      beforeEach(function() {
+        cy.login({ username: 'theYesMan', password: 'nukethencr' })
+        cy.createBlog({
+          title: 'Piper mods',
+          author: 'Nora Nate',
+          url: 'http://www.blockchain.net'
+        })
+        cy.createBlog({
+          title: 'Defense of hoover dam',
+          author: 'James Hsu',
+          url: 'http://www.l33tc0de.com'
+        })
+        cy.contains('logout').click()
+        cy.login({ username: 'syonBoy', password: 'anyaDog' })
+        cy.createBlog({
+          title: 'Programming C++',
+          author: 'Gary Clemens',
+          url: 'http://www.dogcoin.com'
+        })
+        cy.contains('logout').click()
+        cy.login({ username: 'theYesMan', password: 'nukethencr' })
+      })
+
+      it('Blog with most likes has 3 votes; second most with 2 votes', function() {
+        cy.contains('Defense of hoover dam').parent().find('button').as('show-btn')
+        cy.get('@show-btn').click()
+
+        cy.contains('Defense of hoover dam').parent().find('#like-btn').as('like-btn')
+        cy.get('@like-btn').click().click().click()
+
+        cy.contains('Programming C++').parent().find('button').as('show-btn')
+        cy.get('@show-btn').click()
+
+        cy.contains('Programming C++').parent().find('#like-btn').as('like-btn')
+        cy.get('@like-btn').click().click()
+
+        setTimeout([], 5000)
+
+        cy.get('.blog').eq(0).should('contain', 'Defense of hoover dam')
+        cy.get('.blog').eq(1).should('contain', 'Programming C++')
+      })
+    })
   })
 })
