@@ -31,7 +31,10 @@ const anecdoteSlice = createSlice({
       return [...state, newAnecdote]
     },
     voteAnecdote(state, action) {
-      const id = action.payload
+      console.log('st',JSON.parse(JSON.stringify(state)))
+      console.log('act', JSON.parse(JSON.stringify(action)))
+
+      const id = action.payload.id
       const anecdoteForVote = state.find(an => an.id === id)
       const upvotedAnecdote = {
         ...anecdoteForVote,
