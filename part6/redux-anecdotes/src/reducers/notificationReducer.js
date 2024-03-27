@@ -13,7 +13,6 @@ const notificationSlice = createSlice({
       return `you voted '${anecdote}'`
     },
     removeNotification(state, action) {
-      setTimeout(() => {}, 5000)
       return ''
     }
   }
