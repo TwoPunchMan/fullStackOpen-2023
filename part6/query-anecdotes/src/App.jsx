@@ -8,12 +8,11 @@ import AnecdoteList from './components/AnecdoteList'
 const App = () => {
   const queryClient = useQueryClient()
 
-
-
   const result = useQuery({
     queryKey: ['anecdotes'],
     queryFn: getAnecdotes,
-    retry: 1
+    retry: 1,
+    refetchOnWindowFocus: false
   })
 
   console.log(JSON.parse(JSON.stringify(result)))

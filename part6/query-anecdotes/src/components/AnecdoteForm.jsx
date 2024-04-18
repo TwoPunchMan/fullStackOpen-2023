@@ -8,8 +8,9 @@ const AnecdoteForm = ({ client }) => {
 
   const newAnecdoteMutation = useMutation({
     mutationFn: createAnecdote,
-    onSuccess: () => {
-      client.invalidateQueries({ queryKey: ['anecdotes'] })
+    onSuccess: (newAnecdote) => {
+      const anecdotes = client.getQueryData(['anecdotes'])
+      client.setQueryData(['anecdotes'], anecdotes.concat(newAnecdote))
     }
   })
 
