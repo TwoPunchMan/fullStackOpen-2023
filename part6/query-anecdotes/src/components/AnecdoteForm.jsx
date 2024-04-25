@@ -13,6 +13,9 @@ const AnecdoteForm = ({ client }) => {
     onSuccess: (newAnecdote) => {
       const anecdotes = client.getQueryData(['anecdotes'])
       client.setQueryData(['anecdotes'], anecdotes.concat(newAnecdote))
+    },
+    onError: () => {
+      dispatch({ type: 'TOO_SHORT' })
     }
   })
 
@@ -34,7 +37,7 @@ const AnecdoteForm = ({ client }) => {
     dispatch(reducerData)
 
     setTimeout(() => {
-      dispatch({ type: 'NONE', payload: null})
+      dispatch({ type: 'NONE' })
     }, 5000)
   }
 

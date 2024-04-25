@@ -39,7 +39,7 @@ const AnecdoteList = ({ client, anecdotes }) => {
     dispatch(reducerData)
 
     setTimeout(() => {
-      dispatch({ type: 'NONE', payload: null})
+      dispatch({ type: 'NONE' })
     }, 5000)
   }
 

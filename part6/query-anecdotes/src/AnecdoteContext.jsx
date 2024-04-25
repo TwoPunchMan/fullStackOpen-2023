@@ -10,6 +10,8 @@ const anecdoteReducer = (state, action) => {
       return state
     case 'NONE':
       return null
+    case 'TOO_SHORT':
+      return 'too short anecdote, must have length 5 or more'
     default:
       return state
   }
