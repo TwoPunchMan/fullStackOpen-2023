@@ -5,6 +5,8 @@ import AnecdoteForm from './components/AnecdoteForm'
 import Notification from './components/Notification'
 import AnecdoteList from './components/AnecdoteList'
 
+import { AnecdoteContextProvider } from './AnecdoteContext'
+
 const App = () => {
   const queryClient = useQueryClient()
 
@@ -30,11 +32,12 @@ const App = () => {
   return (
     <div>
       <h3>Anecdote app</h3>
+      <AnecdoteContextProvider>
+        <Notification />
+        <AnecdoteForm client={queryClient} />
 
-      <Notification />
-      <AnecdoteForm client={queryClient} />
-
-      <AnecdoteList client={queryClient} anecdotes={anecdotes} />
+        <AnecdoteList client={queryClient} anecdotes={anecdotes} />
+      </AnecdoteContextProvider>
     </div>
   )
 }

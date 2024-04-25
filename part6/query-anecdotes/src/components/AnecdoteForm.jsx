@@ -1,7 +1,9 @@
 import { useMutation } from '@tanstack/react-query'
 import { createAnecdote } from '../requests'
+import { useNotificationDispatch } from '../AnecdoteContext'
 
 const AnecdoteForm = ({ client }) => {
+  const dispatch = useNotificationDispatch()
 
   const generateId = () =>
     Number((Math.random() * 100000).toFixed(0))
@@ -23,6 +25,17 @@ const AnecdoteForm = ({ client }) => {
       id: generateId().toString(),
       votes: 0
     })
+
+    const reducerData = {
+      type: 'CREATE',
+      payload: content
+    }
+
+    dispatch(reducerData)
+
+    setTimeout(() => {
+      dispatch({ type: 'NONE', payload: null})
+    }, 5000)
   }
 
   return (

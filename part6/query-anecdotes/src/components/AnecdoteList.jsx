@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { voteAnecdote } from '../requests'
+import { useNotificationDispatch } from '../AnecdoteContext'
 
 const Anecdote = ({ anecdote, handleClick }) => {
   return (
@@ -16,7 +17,7 @@ const Anecdote = ({ anecdote, handleClick }) => {
 }
 
 const AnecdoteList = ({ client, anecdotes }) => {
-
+  const dispatch = useNotificationDispatch()
   const voteAnecdoteMutation = useMutation({
     mutationFn: voteAnecdote,
     onSuccess: () => {
@@ -29,6 +30,17 @@ const AnecdoteList = ({ client, anecdotes }) => {
       ...anecdote,
       votes: anecdote.votes + 1
     })
+
+    const reducerData = {
+      type: 'VOTE',
+      payload: anecdote.content
+    }
+
+    dispatch(reducerData)
+
+    setTimeout(() => {
+      dispatch({ type: 'NONE', payload: null})
+    }, 5000)
   }
 
   return (
