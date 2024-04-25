@@ -17,11 +17,12 @@ const Anecdote = ({ anecdote, handleClick }) => {
 }
 
 const AnecdoteList = ({ client, anecdotes }) => {
-  const dispatch = useNotificationDispatch()
+  const notifyWith = useNotificationDispatch()
   const voteAnecdoteMutation = useMutation({
     mutationFn: voteAnecdote,
-    onSuccess: () => {
+    onSuccess: ({ content }) => {
       client.invalidateQueries('anecdotes')
+      notifyWith(`anecdote '${content}' voted`)
     }
   })
 
@@ -30,17 +31,6 @@ const AnecdoteList = ({ client, anecdotes }) => {
       ...anecdote,
       votes: anecdote.votes + 1
     })
-
-    const reducerData = {
-      type: 'VOTE',
-      payload: anecdote.content
-    }
-
-    dispatch(reducerData)
-
-    setTimeout(() => {
-      dispatch({ type: 'NONE' })
-    }, 5000)
   }
 
   return (

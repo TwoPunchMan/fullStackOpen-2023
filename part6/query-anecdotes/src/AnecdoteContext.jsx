@@ -2,16 +2,10 @@ import { createContext, useReducer, useContext } from "react";
 
 const anecdoteReducer = (state, action) => {
   switch (action.type) {
-    case 'CREATE':
-      state = `new anecdote '${action.payload}' has been created`
-      return state
-    case 'VOTE':
-      state = `anecdote '${action.payload}' voted`
-      return state
-    case 'NONE':
+    case 'SET':
+      return action.payload
+    case 'CLEAR':
       return null
-    case 'TOO_SHORT':
-      return 'too short anecdote, must have length 5 or more'
     default:
       return state
   }
@@ -26,7 +20,13 @@ export const useNotificationMsg = () => {
 
 export const useNotificationDispatch = () => {
   const anecdoteAndDispatch = useContext(AnecdoteContext)
-  return anecdoteAndDispatch[1]
+  const dispatch = anecdoteAndDispatch[1]
+  return (payload) => {
+    dispatch({ type: 'SET', payload })
+    setTimeout(() => {
+      dispatch({ type: 'CLEAR' })
+    }, 5000)
+  }
 }
 
 export const AnecdoteContextProvider = (props) => {

@@ -3,7 +3,7 @@ import { createAnecdote } from '../requests'
 import { useNotificationDispatch } from '../AnecdoteContext'
 
 const AnecdoteForm = ({ client }) => {
-  const dispatch = useNotificationDispatch()
+  const notifyWith = useNotificationDispatch()
 
   const generateId = () =>
     Number((Math.random() * 100000).toFixed(0))
@@ -13,9 +13,10 @@ const AnecdoteForm = ({ client }) => {
     onSuccess: (newAnecdote) => {
       const anecdotes = client.getQueryData(['anecdotes'])
       client.setQueryData(['anecdotes'], anecdotes.concat(newAnecdote))
+      notifyWith(`new anecdote '${newAnecdote.content}' has been created`)
     },
-    onError: () => {
-      dispatch({ type: 'TOO_SHORT' })
+    onError: (error) => {
+      notifyWith(error.response.data.error)
     }
   })
 
@@ -28,17 +29,6 @@ const AnecdoteForm = ({ client }) => {
       id: generateId().toString(),
       votes: 0
     })
-
-    const reducerData = {
-      type: 'CREATE',
-      payload: content
-    }
-
-    dispatch(reducerData)
-
-    setTimeout(() => {
-      dispatch({ type: 'NONE' })
-    }, 5000)
   }
 
   return (
