@@ -1,8 +1,28 @@
-import React, { useState } from 'react' // we need this now also in component files
+import React, { useState, useEffect } from 'react' // we need this now also in component files
+import axios from 'axios'
+
+import PromisePolyfill from 'promise-polyfill'
+
+if (!window.Promise) {
+  window.Promise = PromisePolyfill
+}
+
+const useNotes = (url) => {
+  const [notes, setNotes] = useState([])
+
+  useEffect(() => {
+    axios.get(url)
+      .then(response => {
+        setNotes(response.data)
+      })
+  }, [url])
+  return notes
+}
 
 const App = () => {
   const [counter, setCounter] = useState(0)
   const [values, setValues] = useState([])
+  const notes = useNotes(BACKEND_URL)
 
   const handleClick = () => {
     setCounter(counter + 1)
@@ -15,6 +35,7 @@ const App = () => {
       <button onClick={handleClick}>
         press
       </button>
+      <div>{notes.length} notes on server {BACKEND_URL}</div>
     </div>
   )
 }
